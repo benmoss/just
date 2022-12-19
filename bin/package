@@ -16,7 +16,7 @@ EXECUTABLE=target/$TARGET/release/just
 
 cargo install cargo-deb
 RUSTFLAGS="--deny warnings --codegen target-feature=+crt-static $TARGET_RUSTFLAGS" \
-  cargo deb --target $TARGET
+  cargo deb --target $TARGET --no-build
 
 if [[ $OS == windows-latest ]]; then
   EXECUTABLE=$EXECUTABLE.exe
