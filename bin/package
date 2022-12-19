@@ -32,7 +32,7 @@ cp \
   LICENSE \
   README.md \
   man/just.1 \
-  target/debian/just* \
+  target/$TARGET/debian/just*.deb \
   $DIST
 
 cd $DIST
