@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 VERSION=${REF#"refs/tags/"}
-DIST=`pwd`/dist
+DIST=$(pwd)/dist
 
 echo "Packaging just $VERSION for $TARGET..."
 
@@ -13,6 +13,9 @@ echo "Building just..."
 RUSTFLAGS="--deny warnings --codegen target-feature=+crt-static $TARGET_RUSTFLAGS" \
   cargo build --bin just --target $TARGET --release
 EXECUTABLE=target/$TARGET/release/just
+
+RUSTFLAGS="--deny warnings --codegen target-feature=+crt-static $TARGET_RUSTFLAGS" \
+  cargo deb --no-build --target $TARGET
 
 if [[ $OS == windows-latest ]]; then
   EXECUTABLE=$EXECUTABLE.exe
@@ -28,19 +31,20 @@ cp \
   LICENSE \
   README.md \
   man/just.1 \
+  target/debian/just* \
   $DIST
 
 cd $DIST
 echo "Creating release archive..."
 case $OS in
-  ubuntu-latest | macos-latest)
-    ARCHIVE=$DIST/just-$VERSION-$TARGET.tar.gz
-    tar czf $ARCHIVE *
-    echo "::set-output name=archive::$ARCHIVE"
-    ;;
-  windows-latest)
-    ARCHIVE=$DIST/just-$VERSION-$TARGET.zip
-    7z a $ARCHIVE *
-    echo "::set-output name=archive::`pwd -W`/just-$VERSION-$TARGET.zip"
-    ;;
+ubuntu-latest | macos-latest)
+  ARCHIVE=$DIST/just-$VERSION-$TARGET.tar.gz
+  tar czf $ARCHIVE *
+  echo "::set-output name=archive::$ARCHIVE"
+  ;;
+windows-latest)
+  ARCHIVE=$DIST/just-$VERSION-$TARGET.zip
+  7z a $ARCHIVE *
+  echo "::set-output name=archive::$(pwd -W)/just-$VERSION-$TARGET.zip"
+  ;;
 esac
