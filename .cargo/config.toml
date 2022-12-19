@@ -1,6 +1,6 @@
 [target.aarch64-unknown-linux-musl]
-linker = "aarch64-linux-musl-gcc"
-strip = { path = "aarch64-linux-musl-strip" }
+linker = "aarch64-linux-gnu-gcc"
+strip = { path = "aarch64-linux-gnu-strip" }
 
 [target.armv7-unknown-linux-musl]
 linker = "arm-linux-gnueabihf-gcc"
