@@ -14,9 +14,12 @@ RUSTFLAGS="--deny warnings --codegen target-feature=+crt-static $TARGET_RUSTFLAG
   cargo build --bin just --target $TARGET --release
 EXECUTABLE=target/$TARGET/release/just
 
-cargo install cargo-deb
-RUSTFLAGS="--deny warnings --codegen target-feature=+crt-static $TARGET_RUSTFLAGS" \
-  cargo deb --target $TARGET --no-build
+if [[ $OS == ubuntu-latest ]]; then
+  cargo install cargo-deb
+  RUSTFLAGS="--deny warnings --codegen target-feature=+crt-static $TARGET_RUSTFLAGS" \
+    cargo deb --target $TARGET --no-build
+  echo "deb=$(find . -name '*.deb')" >>$GITHUB_OUTPUT
+fi
 
 if [[ $OS == windows-latest ]]; then
   EXECUTABLE=$EXECUTABLE.exe
@@ -32,7 +35,6 @@ cp \
   LICENSE \
   README.md \
   man/just.1 \
-  target/$TARGET/debian/just*.deb \
   $DIST
 
 cd $DIST
@@ -41,11 +43,11 @@ case $OS in
 ubuntu-latest | macos-latest)
   ARCHIVE=$DIST/just-$VERSION-$TARGET.tar.gz
   tar czf $ARCHIVE *
-  echo "::set-output name=archive::$ARCHIVE"
+  echo "archive=$ARCHIVE" >>$GITHUB_OUTPUT
   ;;
 windows-latest)
   ARCHIVE=$DIST/just-$VERSION-$TARGET.zip
   7z a $ARCHIVE *
-  echo "::set-output name=archive::$(pwd -W)/just-$VERSION-$TARGET.zip"
+  echo "archive=$(pwd -W)/just-$VERSION-$TARGET.zip" >>$GITHUB_OUTPUT
   ;;
 esac
